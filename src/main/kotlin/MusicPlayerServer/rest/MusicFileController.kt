@@ -13,7 +13,7 @@ class MusicFileController(private val musicService: MusicService) {
     fun getAllMusicFiles(): List<MusicFile> =
             musicService.findAllMusicFiles()
 
-    @GetMapping("/musicfile/{id}")
+    @GetMapping("/musicfiles/{id}")
     fun getMusicFileById(@PathVariable id: Int) =
             musicService.findMusicFileById(id)
 
@@ -24,10 +24,8 @@ class MusicFileController(private val musicService: MusicService) {
     }
 
     @PostMapping("/addMusicFile")
-    fun addNewMusicFile(@PathVariable(value = "musicFile") musicFile: MusicFile): ResponseEntity<MusicFile>{
+    fun addNewMusicFile(@PathVariable(value = "musicFile") musicFile: MusicFile): ResponseEntity<MusicFile> {
         musicService.addNewMusicFile(musicFile)
         return ResponseEntity.ok().body(musicFile)
     }
-
-
 }

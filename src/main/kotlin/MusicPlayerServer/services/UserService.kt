@@ -3,6 +3,7 @@ package MusicPlayerServer.services
 import MusicPlayerServer.domain.User
 import MusicPlayerServer.repository.UserRepository
 import org.springframework.stereotype.Service
+import java.util.*
 import java.util.logging.Logger
 
 @Service
@@ -11,6 +12,7 @@ class UserService(private val userRepository: UserRepository) {
     init {
         addMockUsers()
     }
+
     private var logger: Logger = Logger.getLogger("UserServiceLogger")
 
     fun findAllUsers() = userRepository.findAll()
@@ -19,9 +21,17 @@ class UserService(private val userRepository: UserRepository) {
 
     fun authenticateUser(user: User): Boolean = userRepository.findById(user.id).get().password == user.password
 
+    fun loginUser(user: User): Boolean {
+        val possibleUser: Optional<User> = userRepository.findByUsername(user.username)
+        if (possibleUser.isPresent) {
+            return userRepository.findByUsername(user.username).get().password == user.password
+        }
+        return false
+    }
+
     fun deleteUser(user: User) = userRepository.deleteById(user.id)
 
-    fun updateUser(user: User){
+    fun updateUser(user: User) {
         userRepository.findById(user.id).map { existingUser ->
             val updatedUser: User = existingUser.copy(
                     username = user.username, password = user.password
@@ -30,7 +40,7 @@ class UserService(private val userRepository: UserRepository) {
         }
     }
 
-    private fun addMockUsers(){
+    private fun addMockUsers() {
         userRepository.save(User(1, "mihai", "asdad"))
         userRepository.save(User(2, "adrian", "123"))
         userRepository.save(User(3, "bogdan", "432"))
@@ -38,4 +48,6 @@ class UserService(private val userRepository: UserRepository) {
     }
 
     fun findUserById(id: Int): User = userRepository.findById(id).get()
+
+    fun findUserByUsername(username: String): User = userRepository.findByUsername(username).get()
 }

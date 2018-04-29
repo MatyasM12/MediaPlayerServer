@@ -1,10 +1,10 @@
 package MusicPlayerServer.rest
 
 import MusicPlayerServer.domain.User
-import MusicPlayerServer.repository.UserRepository
 import MusicPlayerServer.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
+import java.util.logging.Logger
 
 @RestController
 @RequestMapping("/api")
@@ -14,18 +14,21 @@ class UserController(private val userService: UserService) {
     fun getAllUsers(): List<User> = userService.findAllUsers()
 
     @GetMapping("/users/{id}")
-    fun getUserById(@PathVariable(value = "id") id:Int): User = userService.findUserById(id)
+    fun getUserById(@PathVariable(value = "id") id: Int): User = userService.findUserById(id)
+
     @PostMapping("/addUser")
-    fun addUser(@PathVariable(value = "user") user: User) = userService.addUser(user)
+    fun addUser(@RequestBody user: User) = userService.addUser(user)!!
 
     @DeleteMapping("/user/{id}")
     fun deleteUser(@PathVariable(value = "user") user: User) = userService.deleteUser(user)
 
     @PutMapping("/updateUser")
-    fun updateUser(@PathVariable(value = "user") user: User) = userService.updateUser(user)
+    fun updateUser(@RequestBody user: User) = userService.updateUser(user)
 
+    private val logger = Logger.getLogger("URC")
     @PostMapping("/login")
-    fun loginUser(@PathVariable user: User): ResponseEntity<User>{
-           return if(userService.authenticateUser(user)) ResponseEntity.ok().body(user) else ResponseEntity.notFound().build()
+    fun loginUser(@RequestBody user: User): ResponseEntity<User> {
+        logger.info("User " + user)
+        return if (userService.loginUser(user)) ResponseEntity.ok().body(userService.findUserByUsername(user.username)) else ResponseEntity.notFound().build()
     }
 }
